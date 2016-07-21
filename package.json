@@ -1,0 +1,19 @@
+{
+  "name": "koa-nunjucks1",
+  "version": "0.0.1",
+  "description": "Nunjunks rendering middleware for koa1",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hcl2020/koa-nunjucks1.git"
+  },
+  "keywords": [
+    "koa",
+    "nunjucks",
+    "rendering"
+  ],
+  "author": "hcl2020",
+  "dependencies": {
+    "nunjucks": "^2.4.2"
+  }
+}
