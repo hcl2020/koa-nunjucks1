@@ -9,7 +9,7 @@ var koa = require('koa');
 
 var app = koa();
 app.use(knj({
-  path:  './templates',
+  path: __dirname + '/templates',
   extname: '.html',
   //other nunjunks options can be assigned here for nunjunks.Environment obj
 }));
