@@ -25,5 +25,22 @@ knj({
 }, app );
 ```
 
+```
+app.use(function *(next){
+
+    this.state.title = 'hello kitty';
+
+    yield next;
+});
+
+app.use(function *(next) {
+    yield this.render('index', {
+        city: 'ChengDu'
+    });
+});
+
+```
+
+
 ## License
 MIT
