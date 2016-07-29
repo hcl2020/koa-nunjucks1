@@ -1,7 +1,7 @@
 {
   "name": "koa-nunjucks1",
-  "version": "0.1.0",
-  "description": "Nunjunks rendering middleware for koa1",
+  "version": "1.0.0",
+  "description": "Nunjunks rendering middleware for koa 1.x",
   "main": "index.js",
   "repository": {
     "type": "git",

@@ -1,26 +1,54 @@
-/*
- * koa 中间件
- * nunjucks 模板后缀名，全局变量
+"use strict";
+/**
+ * Nunjunks rendering middleware for koa 1.x
  *
- *
- * */
-
-
+ * @module KoaNunjucks
+ * @copyright (c) 2016 HeChangLin.
+ * @licence MIT
+ */
 var nunjucks = require("nunjucks");
+var default_opt = {
+    //extname: '',             // default extension name of template file
+    //path: '.',               // path defaults to the current working directory
 
-module.exports = function( opt ) {
-    var options = Object.assign({
-        autoescape: true, //(默认值: true) 控制输出是否被转义，查看 Autoescaping
-        //throwOnUndefined (default: false) 当输出为 null 或 undefined 会抛出异常
-        trimBlocks: true, //(default: false) 自动去除 block/tag 后面的换行符
-        lstripBlocks: true, //(default: false) 自动去除 block/tag 签名的空格
-        //watch (默认值: false) 当模板变化时重新加载
-        //noCache (default: false) 不使用缓存，每次都重新编译
+    //nunjunks options can be assigned here for nunjunks.Environment obj
 
-        //other nunjunks options can be assigned here for nunjunks.Environment obj
-    }, opt);
+    //autoescape: true,        // controls if output with dangerous characters are escaped automatically.
+    //throwOnUndefined: false, // throw errors when outputting a null/undefined value
+    //trimBlocks: false,       // automatically remove trailing newlines from a block/tag
+    //lstripBlocks: false,     // automatically remove leading whitespace from a block/tag
+    //watch: false,            // reload templates when they are changed (server-side)
+    //noCachet: false,         // never use a cache and recompile templates each time (server-side)
+    //tags: see nunjucks syntax , defines the syntax for nunjucks tags.
+}
+
+/**
+ * koa-nunjucks1
+ *
+ * @param {object} opt - Options
+ * @param {object} [app] - Koa application
+ */
+var njk = function njk ( opt, app ) {
+    var options = Object.assign(default_opt, opt);
     var env = nunjucks.configure( options.path, options );
-    //传入 path 指定存放模板的目录，opts 可让某些功能开启或关闭，这两个变量都是可选的。path 的默认值为当前的工作目录，opts 提供以下功能：
+    if( app && app.context ){
+        app.context.nunjucks = env;
+        app.context.render = function(name, data){
+            var ctx = this;
+            var viewData = Object.assign({}, ctx.state||{}, ctx.locals || {}, data);
+            name = name + ( options.extname || '');
+            var defer = Promise.defer();
+            env.render(name, viewData, function (e, res) {
+                if(e) {
+                    defer.reject( e );
+                }
+                ctx.body = res;
+                defer.resolve();
+            });
+            return defer.promise;
+        };
+        return function*(next) {yield next;};
+    }
 
     return function*(next) {
         this.nunjucks = env;
@@ -35,12 +63,13 @@ module.exports = function( opt ) {
                     defer.reject( e );
                 }
                 ctx.body = res;
-                defer.resolve( next ); // TO DO
+                defer.resolve();
             });
-
             return defer.promise;
         };
-
         yield next;
     };
 };
+
+
+module.exports = njk;
